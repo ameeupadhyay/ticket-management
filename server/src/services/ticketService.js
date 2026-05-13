@@ -402,9 +402,74 @@ const getTicketDetails = async (
     return ticket;
 };
 
+const addTicketActivity = async (
+    ticketId,
+    payload
+) => {
+
+    const {
+        message,
+        createdBy,
+    } = payload;
+    const transaction =
+        await sequelize.transaction();
+
+    /*
+      VALIDATION
+    */
+
+    if (!message) {
+        throw new AppError(
+            "Message is required",
+            400
+        );
+    }
+
+    if (!createdBy) {
+        throw new AppError(
+            "CreatedBy is required",
+            400
+        );
+    }
+
+    /*
+      CHECK TICKET EXISTS
+    */
+
+    const ticket =
+        await Ticket.findByPk(ticketId);
+
+    if (!ticket) {
+        throw new AppError(
+            "Ticket not found",
+            404
+        );
+    }
+
+    /*
+      CREATE ACTIVITY
+    */
+
+    const activity =
+        await TicketActivity.create({
+            ticketId,
+
+            type: "NOTE_ADDED",
+
+            message,
+
+            createdBy,
+        }, { transaction });
+
+    await transaction.commit();
+
+    return activity;
+};
+
 module.exports = {
     createTicket,
     getTickets,
     updateTicket,
     getTicketDetails,
+    addTicketActivity
 };

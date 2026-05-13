@@ -72,9 +72,29 @@ const getTicketDetails = asyncHandler(
     }
 );
 
+const addTicketActivity =
+    asyncHandler(
+        async (req, res) => {
+
+            const activity =
+                await ticketService.addTicketActivity(
+                    req.params.id,
+                    req.body
+                );
+
+            res.status(201).json({
+                success: true,
+                message:
+                    "Activity added successfully",
+                data: activity,
+            });
+        }
+    );
+
 module.exports = {
     createTicket,
     getTickets,
     updateTicket,
     getTicketDetails,
+    addTicketActivity
 };
